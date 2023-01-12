@@ -16,4 +16,7 @@ jobs:
         with:
           ssh-private-key: ${{ secrets.SSH_KEY }}
           
-      - run: ssh debian@51.178.30.27 "ls"
+      - run: ssh debian@51.178.30.27 "cd /usr/share/nginx/html/nextjs && git pull"
+      - run: ssh debian@51.178.30.27 "cd /usr/share/nginx/html/nextjs && npm i"
+      - run: ssh debian@51.178.30.27 "cd /usr/share/nginx/html/nextjs && npm run build"
+      - run: ssh debian@51.178.30.27 "cd /usr/share/nginx/html && pm2 startOrReload ecosystem.config.js"
