@@ -16,4 +16,4 @@ jobs:
         with:
           ssh-private-key: ${{ secrets.SSH_KEY }}
           
-      - run: ssh debian@vps-a6ce17b4 "ls"
+      - run: ssh admin@51.178.30.27 "ls"
