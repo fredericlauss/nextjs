@@ -13,23 +13,58 @@ jobs:
           node-version: '18'
       - run: npm install 
       - run: npm run build
-      
+alexisp — Aujourd’hui à 11:10
+name: Build & Test
+
+on: [push]
+
+jobs:
+
+  build:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v3
+      - uses: actions/setup-node@v3
+        with:
+          node-version: '18'
+      - run: npm install
+      - run: npm run build
+      - run: ls -lah
+      - name: Cache node_modules
+        id: cache-node_modules
+        uses: actions/cache@v3
+        with:
+          path: node_modules
+          key: ${{ runner.os }}-node_modules-${{ hashFiles('package-lock.json') }}
+
   test:
     runs-on: ubuntu-latest
+    container: cypress/browsers:node16.16.0-chrome107-ff107-edge
+    strategy:
+      matrix:
+        browser: ['chrome', 'edge']
     needs: build
     steps:
       - uses: actions/checkout@v3
-      
+
+      - name: Cache node_modules
+        id: cache-node_modules
+        uses: actions/cache@v3
+        with:
+          path: node_modules
+          key: ${{ runner.os }}-node_modules-${{ hashFiles('package-lock.json') }}
+  
       - name: Cypress run
         uses: cypress-io/github-action@v5.0.5
         with:
+          browser: ${{ matrix.browser }}
           build: npm run build
           start: npm start
 
       - name: Save video folder
         uses: actions/upload-artifact@v3
         with:
-          name: Test videos
+          name: Test videos ${{ matrix.browser }}
           path: |
             cypress/videos
             cypress/screenshots
